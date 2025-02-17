@@ -1,0 +1,3 @@
+﻿<Project>
+  <Import Project="..\build\qualyteam_api.props" />
+</Project>

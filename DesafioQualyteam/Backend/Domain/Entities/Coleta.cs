@@ -1,27 +1,38 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
+using System.Text.Json.Serialization;
 
-namespace Backend.Domain.Entities;
-
-public class Coleta
+namespace Backend.Domain.Entities
 {
-    public int Id { get; set; }
-
-    public required DateTime Data { get; set; } // Propriedade obrigatória
-    public required decimal Valor { get; set; } // Propriedade obrigatória
-    public required int IndicadorId { get; set; } // Propriedade obrigatória
-    public required Indicador Indicador { get; set; } // Propriedade obrigatória
-
-    // Construtor vazio necessário para o EF Core
-    public Coleta()
+    public class Coleta
     {
-    }
+        public int Id { get; private set; }
+        public DateTime Data { get; private set; }
+        public decimal Valor { get; private set; }
+        public int IndicadorId { get; private set; }
 
-    // Método auxiliar para configurar os valores
-    public void Configurar(DateTime data, decimal valor, Indicador indicador)
-    {
-        Data = data;
-        Valor = valor;
-        Indicador = indicador;
-        IndicadorId = indicador.Id; // Associa o ID do indicador automaticamente
+        // Ao ignorar essa propriedade na serialização, evitamos a recursão infinita.
+        [JsonIgnore]
+        public Indicador Indicador { get; init; }
+
+        // Construtor para criar uma nova coleta, garantindo que a propriedade Indicador seja definida.
+        public Coleta(DateTime data, decimal valor, Indicador indicador)
+        {
+            if (indicador == null)
+                throw new ArgumentNullException(nameof(indicador));
+
+            Data = data;
+            Valor = valor;
+            Indicador = indicador;
+            IndicadorId = indicador.Id;
+        }
+
+        // Construtor sem parâmetros necessário para o EF Core.
+        [SetsRequiredMembers]
+        protected Coleta()
+        {
+            // Indicador será definido posteriormente pelo EF Core.
+            Indicador = null!;
+        }
     }
 }

@@ -1,19 +1,22 @@
+// Arquivo: Frontend/src/components/ResultadoDisplay.jsx
+
 import { useState } from "react";
+import api from "../api/api";
 
 const ResultadoDisplay = ({ indicadores }) => {
   const [indicadorId, setIndicadorId] = useState("");
   const [resultado, setResultado] = useState(null);
 
   const handleCalcular = async () => {
+    if (!indicadorId) {
+      alert("Selecione um indicador.");
+      return;
+    }
     try {
-      const response = await fetch(`http://localhost:5240/api/Indicador/resultado/${indicadorId}`);
-      if (!response.ok) {
-        throw new Error(`Erro ao calcular resultado: ${response.status}`);
-      }
-      const data = await response.json();
-      setResultado(data);
+      const response = await api.get(`/indicadores/${indicadorId}/resultado`);
+      setResultado(response.data);
     } catch (error) {
-      console.error("Erro ao calcular resultado:", error.message);
+      console.error("Erro ao calcular resultado:", error.response?.data || error.message);
     }
   };
 
@@ -45,5 +48,3 @@ const ResultadoDisplay = ({ indicadores }) => {
 };
 
 export default ResultadoDisplay;
-
-

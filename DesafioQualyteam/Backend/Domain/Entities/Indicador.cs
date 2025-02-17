@@ -1,33 +1,51 @@
+// Arquivo: Backend/Domain/Entities/Indicador.cs
+
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
-namespace Backend.Domain.Entities;
-
-public class Indicador
+namespace Backend.Domain.Entities
 {
-    public int Id { get; set; }
-
-    // Propriedades obrigatórias
-    public required string Nome { get; set; }
-    public required string FormaCalculo { get; set; }
-
-    // Propriedade de navegação
-    public ICollection<Coleta> Coletas { get; set; } = new List<Coleta>(); // Inicialização padrão
-
-    // Construtor para inicializar as propriedades obrigatórias
-    public Indicador(string nome, string formaCalculo)
+    public class Indicador
     {
-        if (string.IsNullOrWhiteSpace(nome)) 
-            throw new ArgumentException("O nome do indicador é obrigatório.");
-        
-        if (string.IsNullOrWhiteSpace(formaCalculo)) 
-            throw new ArgumentException("A forma de cálculo do indicador é obrigatória.");
+        public int Id { get; private set; }
 
-        Nome = nome;
-        FormaCalculo = formaCalculo;
-    }
+        // Propriedades required com init público
+        public required string Nome { get; init; }
+        public required string FormaCalculo { get; init; }
 
-    // Construtor vazio necessário para o EF Core
-    public Indicador()
-    {
+        public ICollection<Coleta> Coletas { get; private set; } = new List<Coleta>();
+
+        // Construtor que define os required members.
+        [SetsRequiredMembers]
+        public Indicador(string nome, string formaCalculo)
+        {
+            if (string.IsNullOrWhiteSpace(nome))
+                throw new ArgumentException("O nome do indicador é obrigatório.", nameof(nome));
+            if (string.IsNullOrWhiteSpace(formaCalculo))
+                throw new ArgumentException("A forma de cálculo do indicador é obrigatória.", nameof(formaCalculo));
+
+            Nome = nome;
+            FormaCalculo = formaCalculo;
+        }
+
+        // Construtor sem parâmetros para o EF Core.
+        [SetsRequiredMembers]
+        protected Indicador()
+        {
+            // Atribuindo valores padrão para satisfazer os required members
+            Nome = string.Empty;
+            FormaCalculo = string.Empty;
+            Coletas = new List<Coleta>();
+        }
+
+        // Método de domínio para adicionar uma coleta
+        public void AddColeta(Coleta coleta)
+        {
+            if (coleta == null)
+                throw new ArgumentNullException(nameof(coleta));
+
+            Coletas.Add(coleta);
+        }
     }
 }

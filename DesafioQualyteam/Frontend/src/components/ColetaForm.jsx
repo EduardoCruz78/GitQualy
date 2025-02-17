@@ -1,4 +1,7 @@
+// Arquivo: Frontend/src/components/ColetaForm.jsx
+
 import { useState } from "react";
+import api from "../api/api";
 
 const ColetaForm = ({ indicadores, onColeta }) => {
   const [indicadorId, setIndicadorId] = useState("");
@@ -7,39 +10,22 @@ const ColetaForm = ({ indicadores, onColeta }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Valida os campos antes de enviar
     if (!indicadorId || !data || !valor) {
       alert("Preencha todos os campos.");
       return;
     }
-
-    const novaColeta = {
-      indicadorId: parseInt(indicadorId),
-      data,
-      valor: parseFloat(valor),
-    };
-
     try {
-      const response = await fetch("http://localhost:5240/api/Indicador/coleta", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(novaColeta),
+      await api.post("/coletas", {
+        indicadorId: parseInt(indicadorId),
+        data,
+        valor: parseFloat(valor)
       });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao registrar coleta: ${response.status}`);
-      }
-
-      // Limpa os campos após o cadastro bem-sucedido
       setIndicadorId("");
       setData("");
       setValor("");
-
-      // Chama o callback para atualizar a lista de coletas
       onColeta();
     } catch (error) {
-      console.error("Erro ao registrar coleta:", error.message);
+      console.error("Erro ao registrar coleta:", error.response?.data || error.message);
     }
   };
 
@@ -94,4 +80,4 @@ const ColetaForm = ({ indicadores, onColeta }) => {
   );
 };
 
-export default ColetaForm;  // Aqui está a exportação padrão (default)
+export default ColetaForm;

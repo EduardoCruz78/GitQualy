@@ -1,4 +1,7 @@
+// Arquivo: Frontend/src/components/IndicadorForm.jsx
+
 import { useState } from "react";
+import api from "../api/api";
 
 const IndicadorForm = ({ onCadastro }) => {
   const [nome, setNome] = useState("");
@@ -6,33 +9,15 @@ const IndicadorForm = ({ onCadastro }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Cria o objeto com os dados do novo indicador
-    const novoIndicador = { nome, formaCalculo };
-
     try {
-      // Envia a requisição POST para o backend
-      const response = await fetch("http://localhost:5240/api/Indicador/cadastrar", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "*/*", 
-        },
-        body: JSON.stringify(novoIndicador),
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erro ao cadastrar indicador: ${response.status}`);
+      const response = await api.post("/indicadores", { nome, formaCalculo });
+      if (response.status === 201) {
+        setNome("");
+        setFormaCalculo("MÉDIA");
+        onCadastro();
       }
-
-      // Limpa os campos após o cadastro bem-sucedido
-      setNome("");
-      setFormaCalculo("MÉDIA");
-
-      // Chama o callback para atualizar a lista de indicadores
-      onCadastro();
     } catch (error) {
-      console.error("Erro ao cadastrar indicador:", error.message);
+      console.error("Erro ao cadastrar indicador:", error.response?.data || error.message);
     }
   };
 
