@@ -1,0 +1,47 @@
+{
+  "name": "qualyteam_frontend",
+  "version": "1.0.0",
+  "description": "Frontend for the Qualyteam performance tracking application",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext .jsx,.js",
+    "format": "prettier --write \"src/**/*.{js,jsx,json}\"",
+    "test": "jest",
+    "start:frontend": "npm run dev",
+    "start:backend": "cd ../qualyteam_api; dotnet run",
+    "start": "concurrently \"npm run start:frontend\" \"npm run start:backend\""
+  },
+  "keywords": [
+    "react",
+    "vite",
+    "frontend",
+    "performance-tracking"
+  ],
+  "author": "Your Name",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.6.8",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.22.3"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react-swc": "^3.8.0",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-react": "^7.34.2",
+    "jest": "^29.7.0",
+    "postcss": "^8.5.2",
+    "prettier": "^3.2.5",
+    "tailwindcss": "^4.0.6",
+    "vite": "^6.1.0"
+  }
+}
