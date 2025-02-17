@@ -1,0 +1,2 @@
+# GitQualy
+ inicial
