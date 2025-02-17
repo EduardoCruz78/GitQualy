@@ -11,11 +11,11 @@ namespace Backend.Domain.Entities
         public decimal Valor { get; private set; }
         public int IndicadorId { get; private set; }
 
-        // Ao ignorar essa propriedade na serialização, evitamos a recursão infinita.
+        // Para evitar recursão na serialização, ignoramos esta propriedade
         [JsonIgnore]
         public Indicador Indicador { get; init; }
 
-        // Construtor para criar uma nova coleta, garantindo que a propriedade Indicador seja definida.
+        // Construtor para criação de uma nova coleta
         public Coleta(DateTime data, decimal valor, Indicador indicador)
         {
             if (indicador == null)
@@ -27,12 +27,18 @@ namespace Backend.Domain.Entities
             IndicadorId = indicador.Id;
         }
 
-        // Construtor sem parâmetros necessário para o EF Core.
+        // Construtor sem parâmetros para o EF Core
         [SetsRequiredMembers]
         protected Coleta()
         {
-            // Indicador será definido posteriormente pelo EF Core.
             Indicador = null!;
+        }
+
+        // Método para atualizar os campos da coleta
+        public void Atualizar(DateTime novaData, decimal novoValor)
+        {
+            Data = novaData;
+            Valor = novoValor;
         }
     }
 }

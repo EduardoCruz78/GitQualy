@@ -1,5 +1,3 @@
-// Arquivo: Backend/Tests/UnitTests/IndicadorServiceTests.cs
-
 using Backend.Application.Services;
 using Backend.Domain.Entities;
 using Backend.Domain.Interfaces;
@@ -75,6 +73,41 @@ namespace Backend.Tests.UnitTests
 
             // Assert
             Assert.Equal(15, resultado);
+        }
+
+        [Fact]
+        public async Task AtualizarColetaAsync_Deve_Atualizar_Coleta_Corretamente()
+        {
+            // Arrange
+            var indicador = new Indicador("Teste Atualizar", "SOMA");
+            var coleta = new Coleta(DateTime.Now.AddDays(-1), 50, indicador);
+            indicador.AddColeta(coleta);
+
+            _mockRepo.Setup(r => r.GetColetaByIdAsync(It.IsAny<int>())).ReturnsAsync(coleta);
+            _mockRepo.Setup(r => r.SaveChangesAsync()).Returns(Task.CompletedTask);
+
+            DateTime novaData = DateTime.Now;
+            decimal novoValor = 100;
+
+            // Act
+            await _service.AtualizarColetaAsync(coleta.Id, novaData, novoValor);
+
+            // Assert
+            Assert.Equal(novaData, coleta.Data);
+            Assert.Equal(novoValor, coleta.Valor);
+        }
+
+        [Fact]
+        public async Task AtualizarColetaAsync_Deve_Lancar_Excecao_Quando_Coleta_Nao_Encontrada()
+        {
+            // Arrange
+            _mockRepo.Setup(r => r.GetColetaByIdAsync(It.IsAny<int>())).ReturnsAsync((Coleta?)null);
+
+            // Act & Assert
+            await Assert.ThrowsAsync<Exception>(async () =>
+            {
+                await _service.AtualizarColetaAsync(999, DateTime.Now, 100);
+            });
         }
     }
 }

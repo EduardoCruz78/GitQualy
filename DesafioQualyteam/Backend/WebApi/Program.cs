@@ -1,10 +1,8 @@
-// Arquivo: Backend/WebApi/Program.cs
-
 using Backend.Application.Services;
 using Backend.Domain.Interfaces;
 using Backend.Infrastructure.Data;
 using Backend.Infrastructure.Repositories;
-using Backend.WebApi.DTOs;
+using Backend.WebApi.DTOs; // Certifique-se de que este using esteja presente
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -45,8 +43,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
+//
 // Endpoints da API RESTful
+//
 
+// GET /api/indicadores
 app.MapGet("/api/indicadores", async (IndicatorService service) =>
 {
     var indicadores = await service.GetIndicadoresAsync();
@@ -54,6 +55,17 @@ app.MapGet("/api/indicadores", async (IndicatorService service) =>
 })
 .WithName("GetIndicadores");
 
+// GET /api/coletas
+app.MapGet("/api/coletas", async (IndicatorService service) =>
+{
+    var indicadores = await service.GetIndicadoresAsync();
+    var coletas = indicadores.SelectMany(i => i.Coletas).ToList();
+    return Results.Ok(coletas);
+})
+.WithName("GetColetas")
+.WithOpenApi();
+
+// POST /api/indicadores
 app.MapPost("/api/indicadores", async (IndicadorRequest request, IndicatorService service) =>
 {
     if (string.IsNullOrWhiteSpace(request.Nome) || string.IsNullOrWhiteSpace(request.FormaCalculo))
@@ -71,6 +83,7 @@ app.MapPost("/api/indicadores", async (IndicadorRequest request, IndicatorServic
 })
 .WithName("CadastrarIndicador");
 
+// POST /api/coletas
 app.MapPost("/api/coletas", async (ColetaRequest request, IndicatorService service) =>
 {
     if (request.IndicadorId <= 0 || request.Valor < 0)
@@ -88,6 +101,7 @@ app.MapPost("/api/coletas", async (ColetaRequest request, IndicatorService servi
 })
 .WithName("RegistrarColeta");
 
+// GET /api/indicadores/{id}/resultado
 app.MapGet("/api/indicadores/{id}/resultado", async (int id, IndicatorService service) =>
 {
     try
@@ -101,5 +115,21 @@ app.MapGet("/api/indicadores/{id}/resultado", async (int id, IndicatorService se
     }
 })
 .WithName("CalcularResultado");
+
+// PUT /api/coletas/{id}
+app.MapPut("/api/coletas/{id}", async (int id, ColetaUpdateRequest request, IndicatorService service) =>
+{
+    try
+    {
+        await service.AtualizarColetaAsync(id, request.Data, request.Valor);
+        return Results.Ok();
+    }
+    catch (Exception ex)
+    {
+        return Results.BadRequest(ex.Message);
+    }
+})
+.WithName("AtualizarColeta")
+.WithOpenApi();
 
 app.Run();

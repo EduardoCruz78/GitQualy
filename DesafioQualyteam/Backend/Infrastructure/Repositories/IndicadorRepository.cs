@@ -1,5 +1,3 @@
-// Arquivo: Backend/Infrastructure/Repositories/IndicadorRepository.cs
-
 using Backend.Domain.Entities;
 using Backend.Domain.Interfaces;
 using Backend.Infrastructure.Data;
@@ -38,6 +36,11 @@ namespace Backend.Infrastructure.Repositories
         public async Task AddColetaAsync(Coleta coleta)
         {
             await _context.Coletas.AddAsync(coleta);
+        }
+
+        public async Task<Coleta?> GetColetaByIdAsync(int id)
+        {
+            return await _context.Coletas.FirstOrDefaultAsync(c => c.Id == id);
         }
 
         public async Task SaveChangesAsync()

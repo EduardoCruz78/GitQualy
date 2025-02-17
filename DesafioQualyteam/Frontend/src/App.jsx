@@ -1,8 +1,7 @@
-// Arquivo: Frontend/src/App.jsx
-
 import { useEffect, useState } from "react";
 import IndicadorForm from "./components/IndicadorForm";
 import ColetaForm from "./components/ColetaForm";
+import ColetaUpdateForm from "./components/ColetaUpdateForm";
 import ResultadoDisplay from "./components/ResultadoDisplay";
 import api from "./api/api";
 
@@ -40,6 +39,7 @@ const App = () => {
       </div>
       <IndicadorForm onCadastro={carregarIndicadores} />
       <ColetaForm indicadores={indicadores} onColeta={carregarIndicadores} />
+      <ColetaUpdateForm onUpdate={carregarIndicadores} />
       <ResultadoDisplay indicadores={indicadores} />
     </div>
   );

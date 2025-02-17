@@ -1,5 +1,3 @@
-// Arquivo: Backend/Application/Services/IndicatorService.cs
-
 using Backend.Domain.Entities;
 using Backend.Domain.Interfaces;
 using System;
@@ -28,7 +26,6 @@ namespace Backend.Application.Services
             if (formaCalculo != "MÉDIA" && formaCalculo != "SOMA")
                 throw new ArgumentException("Forma de cálculo inválida.", nameof(formaCalculo));
 
-            // Cria o objeto usando o construtor que agora define os required members.
             var indicador = new Indicador(nome, formaCalculo);
             await _repository.AddIndicadorAsync(indicador);
             await _repository.SaveChangesAsync();
@@ -44,6 +41,17 @@ namespace Backend.Application.Services
 
             var coleta = new Coleta(data, valor, indicador);
             await _repository.AddColetaAsync(coleta);
+            await _repository.SaveChangesAsync();
+        }
+
+        // NOVO método para atualizar uma coleta
+        public async Task AtualizarColetaAsync(int coletaId, DateTime novaData, decimal novoValor)
+        {
+            var coleta = await _repository.GetColetaByIdAsync(coletaId);
+            if (coleta == null)
+                throw new Exception("Coleta não encontrada.");
+
+            coleta.Atualizar(novaData, novoValor);
             await _repository.SaveChangesAsync();
         }
 
