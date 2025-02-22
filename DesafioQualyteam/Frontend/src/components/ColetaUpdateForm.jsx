@@ -1,3 +1,5 @@
+// Arquivo: Frontend/src/components/ColetaUpdateForm.jsx
+
 import { useEffect, useState } from "react";
 import api from "../api/api";
 
@@ -7,7 +9,6 @@ const ColetaUpdateForm = ({ onUpdate }) => {
   const [data, setData] = useState("");
   const [valor, setValor] = useState("");
 
-  // Carrega a lista de coletas ao montar o componente
   useEffect(() => {
     const fetchColetas = async () => {
       try {
@@ -20,12 +21,10 @@ const ColetaUpdateForm = ({ onUpdate }) => {
     fetchColetas();
   }, []);
 
-  // Quando o usuário seleciona uma coleta, preenche os campos com os dados atuais
   useEffect(() => {
     if (selectedColetaId) {
       const selected = coletas.find(c => c.id === parseInt(selectedColetaId));
       if (selected) {
-        // Converter a data para o formato yyyy-MM-dd
         const dateObj = new Date(selected.data);
         const formattedDate = dateObj.toISOString().split("T")[0];
         setData(formattedDate);

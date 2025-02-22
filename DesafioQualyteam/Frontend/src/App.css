@@ -1,6 +1,5 @@
-/* App.css */
+/* Arquivo: Frontend/src/App.css */
 
-/* Estilo geral */
 body {
   font-family: Arial, Helvetica, sans-serif;
   background-color: #f9f9f9;
@@ -18,10 +17,6 @@ p {
   line-height: 1.6;
 }
 
-
-
-
-/* Centralização dos containers */
 .centered-container {
   max-width: 600px;
   margin: 20px auto;
@@ -31,7 +26,6 @@ p {
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Botões */
 button {
   background-color: #007BFF;
   color: white;
@@ -47,9 +41,8 @@ button:hover {
   background-color: #0056b3;
 }
 
-/* Botão Carregar Indicadores */
 .btn-carregar {
-  background-color: #28a745; /* Verde claro */
+  background-color: #28a745;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -60,15 +53,14 @@ button:hover {
 }
 
 .btn-carregar:disabled {
-  background-color: #ccc; /* Cinza claro quando o botão está desabilitado */
+  background-color: #ccc;
   cursor: not-allowed;
 }
 
 .btn-carregar:hover:not(:disabled) {
-  background-color: #218838; /* Verde mais escuro ao passar o mouse */
+  background-color: #218838;
 }
 
-/* Caixa para o "Calcular Resultado" */
 .resultado-container {
   max-width: 600px;
   margin: 20px auto;
@@ -88,7 +80,6 @@ button:hover {
   font-size: 18px;
 }
 
-/* Formulários */
 .form-container {
   max-width: 600px;
   margin: 20px auto;
@@ -121,10 +112,9 @@ button:hover {
   border: 1px solid #ccc;
   border-radius: 4px;
   font-size: 16px;
-  text-align: center; /* Centraliza o texto dentro do campo */
+  text-align: center;
 }
 
-/* Botões de submissão */
 .btn-submit {
   background-color: #007BFF;
   color: white;
@@ -140,17 +130,6 @@ button:hover {
   background-color: #0056b3;
 }
 
-.btn- {
-  background-color: #007BFF;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 25px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s ease;
-}
-/* Rodapé */
 footer {
   background-color: #333;
   color: white;

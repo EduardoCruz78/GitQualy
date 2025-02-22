@@ -1,51 +1,36 @@
-// Arquivo: Backend/Domain/Entities/Indicador.cs
-
 using System;
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 
 namespace Backend.Domain.Entities
 {
+    public enum TipoCalculo
+    {
+        Soma,
+        Media
+    }
+
     public class Indicador
     {
         public int Id { get; private set; }
+        public string Nome { get; private set; }
+        public TipoCalculo TipoCalculo { get; private set; }
+        public List<Coleta> Coletas { get; private set; } = new();
 
-        // Propriedades required com init público
-        public required string Nome { get; init; }
-        public required string FormaCalculo { get; init; }
-
-        public ICollection<Coleta> Coletas { get; private set; } = new List<Coleta>();
-
-        // Construtor que define os required members.
-        [SetsRequiredMembers]
-        public Indicador(string nome, string formaCalculo)
+        public Indicador(string nome, TipoCalculo tipoCalculo)
         {
-            if (string.IsNullOrWhiteSpace(nome))
-                throw new ArgumentException("O nome do indicador é obrigatório.", nameof(nome));
-            if (string.IsNullOrWhiteSpace(formaCalculo))
-                throw new ArgumentException("A forma de cálculo do indicador é obrigatória.", nameof(formaCalculo));
-
-            Nome = nome;
-            FormaCalculo = formaCalculo;
+            Nome = nome ?? throw new ArgumentNullException(nameof(nome));
+            TipoCalculo = tipoCalculo;
         }
 
-        // Construtor sem parâmetros para o EF Core.
-        [SetsRequiredMembers]
+        // Construtor sem parâmetros para o EF Core
         protected Indicador()
         {
-            // Atribuindo valores padrão para satisfazer os required members
             Nome = string.Empty;
-            FormaCalculo = string.Empty;
-            Coletas = new List<Coleta>();
         }
 
-        // Método de domínio para adicionar uma coleta
-        public void AddColeta(Coleta coleta)
+        public void AdicionarColeta(Coleta coleta)
         {
-            if (coleta == null)
-                throw new ArgumentNullException(nameof(coleta));
-
-            Coletas.Add(coleta);
+            Coletas.Add(coleta ?? throw new ArgumentNullException(nameof(coleta)));
         }
     }
 }

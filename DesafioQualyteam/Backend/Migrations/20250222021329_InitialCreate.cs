@@ -18,7 +18,7 @@ namespace Backend.Migrations
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Nome = table.Column<string>(type: "TEXT", nullable: false),
-                    FormaCalculo = table.Column<string>(type: "TEXT", nullable: false)
+                    TipoCalculo = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {

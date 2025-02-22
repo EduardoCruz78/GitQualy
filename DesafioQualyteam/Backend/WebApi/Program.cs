@@ -1,8 +1,9 @@
+// Arquivo: Backend/WebApi/Program.cs
+using Microsoft.AspNetCore.OpenApi;
 using Backend.Application.Services;
-using Backend.Domain.Interfaces;
+using Backend.Domain.Entities;
+using Backend.WebApi.DTOs;
 using Backend.Infrastructure.Data;
-using Backend.Infrastructure.Repositories;
-using Backend.WebApi.DTOs; // Certifique-se de que este using esteja presente
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 
@@ -12,8 +13,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlite("Data Source=app.db"));
 
-// Registro dos repositórios e serviços para injeção de dependência
-builder.Services.AddScoped<IIndicadorRepository, IndicadorRepository>();
+// Registro do serviço
 builder.Services.AddScoped<IndicatorService>();
 
 // Configuração do CORS
@@ -43,15 +43,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseCors("AllowAll");
 
-//
-// Endpoints da API RESTful
-//
-
 // GET /api/indicadores
 app.MapGet("/api/indicadores", async (IndicatorService service) =>
 {
     var indicadores = await service.GetIndicadoresAsync();
-    return Results.Ok(indicadores);
+    var response = indicadores.Select(i => new IndicadorResponse(i.Id, i.Nome, i.TipoCalculo.ToString().ToUpper()));
+    return Results.Ok(response);
 })
 .WithName("GetIndicadores");
 
@@ -59,36 +56,42 @@ app.MapGet("/api/indicadores", async (IndicatorService service) =>
 app.MapGet("/api/coletas", async (IndicatorService service) =>
 {
     var indicadores = await service.GetIndicadoresAsync();
-    var coletas = indicadores.SelectMany(i => i.Coletas).ToList();
-    return Results.Ok(coletas);
+    var coletas = indicadores.SelectMany(i => i.Coletas);
+    var response = coletas.Select(c => new ColetaResponse(c.Id, c.Data, c.Valor, c.IndicadorId));
+    return Results.Ok(response);
 })
 .WithName("GetColetas")
 .WithOpenApi();
 
 // POST /api/indicadores
+// Arquivo: Backend/WebApi/Program.cs
 app.MapPost("/api/indicadores", async (IndicadorRequest request, IndicatorService service) =>
 {
     if (string.IsNullOrWhiteSpace(request.Nome) || string.IsNullOrWhiteSpace(request.FormaCalculo))
         return Results.BadRequest("Os campos 'Nome' e 'FormaCalculo' são obrigatórios.");
 
+    // Conversão de string para TipoCalculo
+    if (!Enum.TryParse<TipoCalculo>(request.FormaCalculo, true, out var tipoCalculo))
+        return Results.BadRequest("FormaCalculo inválido.");
+
     try
     {
-        var indicador = await service.CadastrarIndicadorAsync(request.Nome, request.FormaCalculo);
-        return Results.Created($"/api/indicadores/{indicador.Id}", indicador);
+        var indicador = await service.CadastrarIndicadorAsync(request.Nome, tipoCalculo);
+        var response = new IndicadorResponse(indicador.Id, indicador.Nome, indicador.TipoCalculo.ToString().ToUpper());
+        return Results.Created($"/api/indicadores/{indicador.Id}", response);
     }
     catch (Exception ex)
     {
         return Results.BadRequest(ex.Message);
     }
-})
-.WithName("CadastrarIndicador");
+});
+
 
 // POST /api/coletas
 app.MapPost("/api/coletas", async (ColetaRequest request, IndicatorService service) =>
 {
     if (request.IndicadorId <= 0 || request.Valor < 0)
         return Results.BadRequest("Os campos 'IndicadorId' e 'Valor' devem ser válidos.");
-
     try
     {
         await service.RegistrarColetaAsync(request.IndicadorId, request.Data, request.Valor);

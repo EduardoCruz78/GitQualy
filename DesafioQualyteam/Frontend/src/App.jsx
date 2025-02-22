@@ -1,3 +1,5 @@
+// Arquivo: Frontend/src/App.jsx
+
 import { useEffect, useState } from "react";
 import IndicadorForm from "./components/IndicadorForm";
 import ColetaForm from "./components/ColetaForm";

@@ -1,5 +1,6 @@
 using Backend.Domain.Entities;
-using Backend.Domain.Interfaces;
+using Backend.Infrastructure.Data;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,65 +10,59 @@ namespace Backend.Application.Services
 {
     public class IndicatorService
     {
-        private readonly IIndicadorRepository _repository;
+        private readonly ApplicationDbContext _context;
 
-        public IndicatorService(IIndicadorRepository repository)
+        public IndicatorService(ApplicationDbContext context)
         {
-            _repository = repository;
+            _context = context;
         }
 
-        public async Task<IEnumerable<Indicador>> GetIndicadoresAsync()
+        public async Task<Indicador> CadastrarIndicadorAsync(string nome, TipoCalculo tipoCalculo)
         {
-            return await _repository.GetAllAsync();
-        }
-
-        public async Task<Indicador> CadastrarIndicadorAsync(string nome, string formaCalculo)
-        {
-            if (formaCalculo != "MÉDIA" && formaCalculo != "SOMA")
-                throw new ArgumentException("Forma de cálculo inválida.", nameof(formaCalculo));
-
-            var indicador = new Indicador(nome, formaCalculo);
-            await _repository.AddIndicadorAsync(indicador);
-            await _repository.SaveChangesAsync();
-
+            var indicador = new Indicador(nome, tipoCalculo);
+            _context.Indicadores.Add(indicador);
+            await _context.SaveChangesAsync();
             return indicador;
-        }
-
-        public async Task RegistrarColetaAsync(int indicadorId, DateTime data, decimal valor)
-        {
-            var indicador = await _repository.GetByIdAsync(indicadorId);
-            if (indicador == null)
-                throw new Exception("Indicador não encontrado.");
-
-            var coleta = new Coleta(data, valor, indicador);
-            await _repository.AddColetaAsync(coleta);
-            await _repository.SaveChangesAsync();
-        }
-
-        // NOVO método para atualizar uma coleta
-        public async Task AtualizarColetaAsync(int coletaId, DateTime novaData, decimal novoValor)
-        {
-            var coleta = await _repository.GetColetaByIdAsync(coletaId);
-            if (coleta == null)
-                throw new Exception("Coleta não encontrada.");
-
-            coleta.Atualizar(novaData, novoValor);
-            await _repository.SaveChangesAsync();
         }
 
         public async Task<decimal> CalcularResultadoAsync(int indicadorId)
         {
-            var indicador = await _repository.GetByIdAsync(indicadorId);
-            if (indicador == null)
-                throw new Exception("Indicador não encontrado.");
+            var indicador = await _context.Indicadores
+                .Include(i => i.Coletas)
+                .FirstOrDefaultAsync(i => i.Id == indicadorId)
+                ?? throw new InvalidOperationException("Indicador não encontrado.");
 
-            var valores = indicador.Coletas.Select(c => c.Valor);
-            return indicador.FormaCalculo switch
+            return indicador.TipoCalculo switch
             {
-                "SOMA" => valores.Sum(),
-                "MÉDIA" => valores.Any() ? valores.Average() : 0,
-                _ => throw new Exception("Forma de cálculo inválida.")
+                TipoCalculo.Soma => indicador.Coletas.Sum(c => c.Valor),
+                TipoCalculo.Media => indicador.Coletas.Average(c => c.Valor),
+                _ => throw new InvalidOperationException("Tipo de cálculo inválido.")
             };
+        }
+
+        public async Task RegistrarColetaAsync(int indicadorId, DateTime data, decimal valor)
+        {
+            var indicador = await _context.Indicadores.FindAsync(indicadorId)
+                ?? throw new InvalidOperationException("Indicador não encontrado.");
+
+            var coleta = new Coleta(data, valor, indicador);
+            _context.Coletas.Add(coleta);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task AtualizarColetaAsync(int coletaId, DateTime novaData, decimal novoValor)
+        {
+            var coleta = await _context.Coletas.FindAsync(coletaId)
+                ?? throw new InvalidOperationException("Coleta não encontrada.");
+
+            coleta.AtualizarData(novaData);
+            coleta.AtualizarValor(novoValor);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<List<Indicador>> GetIndicadoresAsync()
+        {
+            return await _context.Indicadores.Include(i => i.Coletas).ToListAsync();
         }
     }
 }

@@ -25,7 +25,7 @@ Write-Host "Iniciando o backend..."
 Start-Process "dotnet" -ArgumentList "run" -WorkingDirectory "./Backend"
 
 # Aguardar alguns segundos para garantir que o backend inicie
-Start-Sleep -Seconds 7
+Start-Sleep -Seconds 5
 
 # Iniciar o frontend
 Write-Host "Iniciando o frontend..."

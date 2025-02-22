@@ -15,7 +15,7 @@ namespace Backend.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configurações adicionais podem ser definidas aqui via Fluent API
+            // Configurações adicionais via Fluent API, se necessário
         }
     }
 }

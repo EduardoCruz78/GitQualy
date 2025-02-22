@@ -5,7 +5,7 @@ import api from "../api/api";
 
 const IndicadorForm = ({ onCadastro }) => {
   const [nome, setNome] = useState("");
-  const [formaCalculo, setFormaCalculo] = useState("MÉDIA");
+  const [formaCalculo, setFormaCalculo] = useState("Media"); // valor padrão atualizado
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -13,7 +13,7 @@ const IndicadorForm = ({ onCadastro }) => {
       const response = await api.post("/indicadores", { nome, formaCalculo });
       if (response.status === 201) {
         setNome("");
-        setFormaCalculo("MÉDIA");
+        setFormaCalculo("Media");
         onCadastro();
       }
     } catch (error) {
@@ -46,8 +46,8 @@ const IndicadorForm = ({ onCadastro }) => {
           required
           className="form-select"
         >
-          <option value="MÉDIA">MÉDIA</option>
-          <option value="SOMA">SOMA</option>
+          <option value="Media">Média</option>
+          <option value="Soma">Soma</option>
         </select>
       </div>
       <button type="submit" className="btn-submit">Cadastrar</button>
