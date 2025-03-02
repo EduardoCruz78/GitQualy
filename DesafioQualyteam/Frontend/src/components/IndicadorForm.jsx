@@ -1,57 +1,88 @@
-// Arquivo: Frontend/src/components/IndicadorForm.jsx
-
 import { useState } from "react";
 import api from "../api/api";
 
 const IndicadorForm = ({ onCadastro }) => {
   const [nome, setNome] = useState("");
-  const [formaCalculo, setFormaCalculo] = useState("Media"); // valor padrão atualizado
+  const [formaCalculo, setFormaCalculo] = useState("Media");
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
+    setSuccess(false);
+    
     try {
       const response = await api.post("/indicadores", { nome, formaCalculo });
       if (response.status === 201) {
         setNome("");
         setFormaCalculo("Media");
+        setSuccess(true);
         onCadastro();
+        
+       
+        setTimeout(() => {
+          setSuccess(false);
+        }, 3000);
       }
     } catch (error) {
       console.error("Erro ao cadastrar indicador:", error.response?.data || error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="form-container">
-      <h2 className="form-title">Cadastrar Indicador</h2>
-      <div className="form-group">
-        <label htmlFor="nome">Nome:</label>
-        <input
-          type="text"
-          id="nome"
-          name="nome"
-          value={nome}
-          onChange={(e) => setNome(e.target.value)}
-          required
-          className="form-input"
-        />
+    <div className="card">
+      <div className="card-header">
+        <h2 className="card-title">Cadastrar Indicador</h2>
       </div>
-      <div className="form-group">
-        <label htmlFor="formaCalculo">Forma de Cálculo:</label>
-        <select
-          id="formaCalculo"
-          name="formaCalculo"
-          value={formaCalculo}
-          onChange={(e) => setFormaCalculo(e.target.value)}
-          required
-          className="form-select"
+      
+      {success && (
+        <div className="success-alert">
+          Indicador cadastrado com sucesso!
+        </div>
+      )}
+      
+      <form onSubmit={handleSubmit}>
+        <div className="form-group">
+          <label htmlFor="nome">Nome do Indicador</label>
+          <input
+            type="text"
+            id="nome"
+            name="nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+            required
+            className="form-input"
+            placeholder="Ex: Taxa de Defeitos"
+          />
+        </div>
+        
+        <div className="form-group">
+          <label htmlFor="formaCalculo">Método de Cálculo</label>
+          <select
+            id="formaCalculo"
+            name="formaCalculo"
+            value={formaCalculo}
+            onChange={(e) => setFormaCalculo(e.target.value)}
+            required
+            className="form-select"
+          >
+            <option value="Media">Média</option>
+            <option value="Soma">Soma</option>
+          </select>
+        </div>
+        
+        <button 
+          type="submit" 
+          className="btn-submit"
+          disabled={loading}
         >
-          <option value="Media">Média</option>
-          <option value="Soma">Soma</option>
-        </select>
-      </div>
-      <button type="submit" className="btn-submit">Cadastrar</button>
-    </form>
+          {loading ? "Cadastrando..." : "Cadastrar Indicador"}
+        </button>
+      </form>
+    </div>
   );
 };
 

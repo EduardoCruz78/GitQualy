@@ -1,5 +1,3 @@
-// Arquivo: Backend/Infrastructure/Data/ApplicationDbContext.cs
-
 using Backend.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 
@@ -15,7 +13,10 @@ namespace Backend.Infrastructure.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            // Configurações adicionais via Fluent API, se necessário
+            modelBuilder.Entity<Coleta>()
+                .HasOne(c => c.Indicador)
+                .WithMany(i => i.Coletas)
+                .HasForeignKey(c => c.IndicadorId);
         }
     }
 }

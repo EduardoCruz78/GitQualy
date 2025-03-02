@@ -1,5 +1,3 @@
-// Arquivo: Frontend/src/components/ColetaUpdateForm.jsx
-
 import { useEffect, useState } from "react";
 import api from "../api/api";
 

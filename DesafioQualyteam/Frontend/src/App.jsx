@@ -1,16 +1,19 @@
-// Arquivo: Frontend/src/App.jsx
-
 import { useEffect, useState } from "react";
 import IndicadorForm from "./components/IndicadorForm";
 import ColetaForm from "./components/ColetaForm";
 import ColetaUpdateForm from "./components/ColetaUpdateForm";
 import ResultadoDisplay from "./components/ResultadoDisplay";
+import Header from "./components/Header";
+import Footer from "./components/Footer";
+import Sidebar from "./components/Sidebar";
 import api from "./api/api";
+import "./App.css";
 
 const App = () => {
   const [indicadores, setIndicadores] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const carregarIndicadores = async () => {
     try {
@@ -29,20 +32,45 @@ const App = () => {
     carregarIndicadores();
   }, []);
 
+  const renderContent = () => {
+    switch (activeTab) {
+      case "dashboard":
+        return <ResultadoDisplay indicadores={indicadores} />;
+      case "cadastrarIndicador":
+        return <IndicadorForm onCadastro={carregarIndicadores} />;
+      case "registrarColeta":
+        return <ColetaForm indicadores={indicadores} onColeta={carregarIndicadores} />;
+      case "atualizarColeta":
+        return <ColetaUpdateForm onUpdate={carregarIndicadores} />;
+      default:
+        return <ResultadoDisplay indicadores={indicadores} />;
+    }
+  };
+
   return (
-    <div className="App">
-      <div className="form-container">
-        <h1>Desafio Qualyteam</h1>
-        {loading && <p>Carregando indicadores...</p>}
-        {error && <p style={{ color: "red" }}>{error}</p>}
-        <button onClick={carregarIndicadores} className="btn-submit" disabled={loading}>
-          {loading ? "Carregando..." : "Carregar Indicadores"}
-        </button>
+    <div className="app">
+      <Header />
+      <div className="main-container">
+        <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+        <main className="content">
+          {loading && (
+            <div className="loading-container">
+              <div className="spinner"></div>
+              <p>Carregando dados...</p>
+            </div>
+          )}
+          {error && (
+            <div className="error-container">
+              <p>{error}</p>
+              <button onClick={carregarIndicadores} className="btn-refresh">
+                Tentar novamente
+              </button>
+            </div>
+          )}
+          {renderContent()}
+        </main>
       </div>
-      <IndicadorForm onCadastro={carregarIndicadores} />
-      <ColetaForm indicadores={indicadores} onColeta={carregarIndicadores} />
-      <ColetaUpdateForm onUpdate={carregarIndicadores} />
-      <ResultadoDisplay indicadores={indicadores} />
+      <Footer />
     </div>
   );
 };

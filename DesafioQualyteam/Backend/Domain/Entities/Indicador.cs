@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Backend.Domain.Entities
 {
@@ -12,7 +13,7 @@ namespace Backend.Domain.Entities
     public class Indicador
     {
         public int Id { get; private set; }
-        public string Nome { get; private set; }
+        public string? Nome { get; private set; }
         public TipoCalculo TipoCalculo { get; private set; }
         public List<Coleta> Coletas { get; private set; } = new();
 
@@ -22,15 +23,32 @@ namespace Backend.Domain.Entities
             TipoCalculo = tipoCalculo;
         }
 
-        // Construtor sem parâmetros para o EF Core
-        protected Indicador()
+        protected Indicador() { }
+
+        public void RegistrarColeta(DateTime data, decimal valor)
         {
-            Nome = string.Empty;
+            var coleta = new Coleta(data, valor, this);
+            Coletas.Add(coleta);
         }
 
-        public void AdicionarColeta(Coleta coleta)
+        public bool AtualizarColeta(int coletaId, DateTime novaData, decimal novoValor)
         {
-            Coletas.Add(coleta ?? throw new ArgumentNullException(nameof(coleta)));
+            var coleta = Coletas.FirstOrDefault(c => c.Id == coletaId);
+            if (coleta == null)
+                return false;
+            coleta.AtualizarData(novaData);
+            coleta.AtualizarValor(novoValor);
+            return true;
+        }
+
+        public decimal CalcularResultado()
+        {
+            return TipoCalculo switch
+            {
+                TipoCalculo.Soma => Coletas.Sum(c => c.Valor),
+                TipoCalculo.Media => Coletas.Any() ? Coletas.Average(c => c.Valor) : 0,
+                _ => throw new InvalidOperationException("Tipo de cálculo inválido.")
+            };
         }
     }
 }

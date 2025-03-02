@@ -10,7 +10,6 @@ namespace Backend.Domain.Entities
         public int IndicadorId { get; private set; }
         public Indicador Indicador { get; private set; } = null!;
 
-        // Construtor para criação manual
         public Coleta(DateTime data, decimal valor, Indicador indicador)
         {
             Data = data;
@@ -18,10 +17,7 @@ namespace Backend.Domain.Entities
             Indicador = indicador ?? throw new ArgumentNullException(nameof(indicador));
         }
 
-        // Construtor sem parâmetros para o EF Core
-        protected Coleta()
-        {
-        }
+        protected Coleta() { }
 
         public void AtualizarData(DateTime novaData)
         {
