@@ -77,11 +77,7 @@ const ColetaForm = ({ indicadores, onColeta }) => {
           </select>
         </div>
         
-        {indicadorSelecionado && (
-          <div className="indicador-info">
-            <p>Método de cálculo: {indicadorSelecionado.formaCalculo === "Media" ? "Média" : "Soma"}</p>
-          </div>
-        )}
+        
         
         <div className="form-group">
           <label htmlFor="data">Data da Coleta</label>

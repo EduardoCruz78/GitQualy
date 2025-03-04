@@ -106,11 +106,7 @@ const ResultadoDisplay = ({ indicadores }) => {
           </select>
         </div>
         
-        {indicadorSelecionado && (
-          <div className="indicador-info">
-            <p>Método de cálculo: {indicadorSelecionado.formaCalculo === "Media" ? "Média" : "Soma"}</p>
-          </div>
-        )}
+        
         
         <button 
           onClick={handleCalcular} 
